@@ -1,0 +1,93 @@
+<html>
+    <head>
+    <title>Web 3 App Login</title>
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+    <link href="./index.js" rel="stylesheet">
+    </head>
+    <body class="flex w-screen h-screen justify-center items-center">
+
+        <main class="p-10 flex justify-center min-h-full">
+            <div class="w-4/5">
+              <div class="mb-10">
+                <button id="loginButton" class="rounded bg-purple-500 p-2 text-white">
+                    Login with Metamask
+                </button>
+                <p id="userWallet" class="text-lg text-gray-800 my-2"></p>
+                <button id="load_button" class="rounded bg-purple-500 p-2 text-white">
+                    Load all your ntfs
+                </button>
+
+              </div>
+    
+              <div id="nfts" class="flex gap-7 flex-wrap"></div>
+            </div>
+          </main>
+
+        <template id="nft_template">
+            <section>
+            <h1 class="font-bold bg-yellow-500 text-white text-center rounded-t-md"></h1>
+
+            <a href="" target="_blank">
+                <img class="rounded-b-md w-40 h-40" src="" alt="" />
+            </a>
+            </section>
+        </template>
+
+        <script>
+
+            window.userWalletAddress = null
+
+            const loginButton = document.getElementById('loginButton')
+            const userWallet = document.getElementById('userWallet')
+            
+            function toggleButton() {
+                if(!window.ethereum)
+                {
+                    loginButton.innerText = "Metamask is not installed"
+                    loginButton.classList.remove('bg-purple-500','text-white')
+                    loginButton.classList.add('bg-gray-500','text-gray-800','cursor-not-allowed')
+                    return false
+                }
+
+                loginButton.addEventListener('click', loginWithMetamask);
+            }
+
+
+
+            async function loginWithMetamask(){
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+                    .catch((e) => {
+                        alert(e.message)
+                        return
+                    })
+
+                if(!accounts){ return }
+                
+                window.userWalletAddress = accounts[0]
+                userWallet.innerText = window.userWalletAddress
+                loginButton.innerText = 'Sign out of Metamask'
+                
+                loginButton.removeEventListener('click', loginWithMetamask )
+                loginButton.addEventListener('click', signOutOfMetamask);
+            }
+
+            function signOutOfMetamask(){
+                window.userWalletAddress = null
+                userWallet.innerHTML = ''
+                loginButton.innerText = 'Login with Metamask'
+                loginButton.removeEventListener('click', signOutOfMetamask )
+                loginButton.addEventListener('click', loginWithMetamask);
+            }
+
+            window.addEventListener("DOMContentLoaded", (event) => {
+                toggleButton()
+            });
+
+        
+        </script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0-rc.0/web3.min.js"></script>
+
+        <script type="module" src="index.js"></script>
+    </body>
+</html>
